@@ -10,7 +10,7 @@
 1. Clonez le repository :
 
    ```bash
-   git clone <url-du-repository>
+   git clone https://github.com/1u1ucas/task-app-api.git
    ```
 
 2. Installez les dépendances :
@@ -21,7 +21,13 @@
 
 3. Configurez les variables d'environnement (voir [Configuration](#configuration)).
 
-4. Démarrez l'application :
+4. Lancer les containers Docker : 
+
+  ```
+  docker compose up -d
+  ```
+
+5. Démarrez l'application :
 
    ```bash
    npm run start:dev
