@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -20,8 +20,13 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  findOneById(@Param('id') id: string) {
+    return this.userService.findOneById(+id);
+  }
+
+  @Get(':email')
+  findOneByEmail(@Param('email') email: string) {
+    return this.userService.findOneByEmail(email);
   }
 
   @ApiBody({ type: UpdateUserDto })

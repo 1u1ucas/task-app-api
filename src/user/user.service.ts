@@ -7,6 +7,9 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
+  findByEmail(email: string) {
+    throw new Error('Method not implemented.');
+  }
     constructor(
       @InjectRepository(UserEntity)
       private readonly userRepository: Repository<UserEntity>,
@@ -26,7 +29,7 @@ async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     return tasksList;
   }
 
-  async findOne(id: number): Promise<UserEntity> {
+  async findOneById(id: number): Promise<UserEntity> {
     const user = await  this.userRepository
       .createQueryBuilder('user')
       .where('user.id = :id', {id})
@@ -40,15 +43,28 @@ async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     return user;
   }
 
+  async findOneByEmail(email: string): Promise<UserEntity> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', {email})
+      .getOne();
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
 
     this.userRepository.update(id, updateUserDto);
 
-    return this.findOne(id);
+    return this.findOneById(id);
   }
 
   async remove(id: number): Promise<any> {
-    await this.findOne(id);
+    await this.findOneById(id);
 
     const task = this.userRepository.softDelete(id);
     return task;
