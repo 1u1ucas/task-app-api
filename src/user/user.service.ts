@@ -7,9 +7,6 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  findByEmail(email: string) {
-    throw new Error('Method not implemented.');
-  }
     constructor(
       @InjectRepository(UserEntity)
       private readonly userRepository: Repository<UserEntity>,
@@ -33,7 +30,6 @@ async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const user = await  this.userRepository
       .createQueryBuilder('user')
       .where('user.id = :id', {id})
-      .addSelect('user.password', 'password')
       .getOne();
 
     if (!user) {
@@ -47,6 +43,7 @@ async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email = :email', {email})
+      .addSelect('user.password')
       .getOne();
 
     if (!user) {

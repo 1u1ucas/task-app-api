@@ -3,27 +3,40 @@ import { SignupDto } from './dto/signup.dto';
 import { SigninDto } from './dto/signin.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService: UserService,) {}
-        
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    async signin(signinDto: SigninDto) {
-        //check if the user exist and get user
+  async signin(signinDto: SigninDto) {
+    const user = await this.userService.findOneByEmail(signinDto.email);
 
-        const user = await this.userService.findOneByEmail(signinDto.email);
-        // check if password is correct
-        if (bcrypt.compare(signinDto.password, user.password)) {
-            return user;
-        }
-        throw new UnauthorizedException('Invalid credentials');
+    const isPasswordCorrect = await bcrypt.compare(
+      signinDto.password,
+      user.password,
+    );
+
+    if (!isPasswordCorrect) {
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    signup(signupDto: SignupDto) {
-        //crypter le mot de passes
-        signupDto.password = bcrypt.hashSync(signupDto.password, 10 );
-        //créer un utilisateur
-       return this.userService.create(signupDto);
-    }
+    const payload = {
+      id: user.id,
+    };
+
+    const access_token = await this.jwtService.sign(payload);
+
+    return { access_token };
+  }
+
+  async signup(signupDto: SignupDto) {
+    const password = await bcrypt.hash(signupDto.password, 10);
+    signupDto.password = password;
+
+    return this.userService.create(signupDto);
+  }
 }
